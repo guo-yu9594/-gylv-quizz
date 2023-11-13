@@ -49,7 +49,7 @@ const palette: PaletteType = [
   { color: "warning", gradient: "yellow" },
 ];
 
-const msPerQuestion: number = 500;
+const msPerQuestion: number = 15000;
 const progessRefreshTime: number = 50;
 
 export default function Quiz() {

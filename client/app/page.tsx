@@ -10,7 +10,7 @@ export default function Home() {
         <h1 className={title({ color: "violet" })}>beautiful&nbsp;</h1>
         <h1 className={title()}>Quiz.</h1>
       </div>
-      <div className="flex flex-col mt-12 space-y-4">
+      <div className="flex flex-col mt-12 space-y-4 items-center">
         <Link href="single">
           <Button color="primary" variant="flat" size="lg">
             Singleplayer
