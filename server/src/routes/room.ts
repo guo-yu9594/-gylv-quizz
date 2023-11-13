@@ -2,6 +2,15 @@ import express from "express";
 import { Server } from "socket.io";
 import http from "http";
 const router: any = express.Router();
+
+type JoinData = {
+  username: string;
+  roomId: string;
+};
+type CreateData = {
+  username: string;
+};
+
 interface ServerToClientEvents {
   noArg: () => void;
   basicEmit: (a: number, b: string, c: Buffer) => void;
@@ -10,6 +19,8 @@ interface ServerToClientEvents {
 
 interface ClientToServerEvents {
   hello: () => void;
+  join: (data: JoinData, callback: any) => void;
+  create: (data: CreateData, callback: any) => void;
 }
 
 interface InterServerEvents {
@@ -39,23 +50,27 @@ const io = new Server<
   },
 });
 
-const sessionsMap: {} = {};
-
 io.on("connection", (socket) => {
-  // console.log(socket.handshake.query);
-
-  let useruuid: any = socket.handshake.query.user;
-  socket.data.name = useruuid;
-  // socket.broadcast.emit('updatedid', socket.id);
-
-  let roomid: any = socket.handshake.query.room;
-
-  // socket.join("some room");
-  socket.once("hello", (...args) => {
-    console.log(args);
+  console.log(socket.id);
+  socket.on("create", (data, callback) => {
+    callback(socket.id.slice(0, 6));
+    console.log(data);
+    socket.join(socket.id.slice(0, 6));
   });
-  socket.on("disconnect", () => {
-    console.log("User disconnected");
+  socket.on("join", (data, callback) => {
+    console.log(data);
+
+    socket.join(data.roomId);
+    callback("room " + data.roomId + " joined");
+  });
+
+  // let useruuid: any = socket.handshake.query.user;
+  // socket.data.name = useruuid;
+  // let roomid: any = socket.handshake.query.room;
+
+  socket.on("disconnect", (reason) => {
+    console.log("User disconnected" + socket.id);
+    console.log(reason);
   });
 });
 
