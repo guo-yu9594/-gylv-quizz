@@ -1,5 +1,15 @@
 import { tv } from "tailwind-variants";
 
+export const gradient = {
+	violet: "from-[#FF1CF7] to-[#b249f8]",
+	yellow: "from-[#FF705B] to-[#FFB457]",
+	blue: "from-[#5EA2EF] to-[#0072F5]",
+	cyan: "from-[#00b7fa] to-[#01cfea]",
+	green: "from-[#6FEE8D] to-[#17c964]",
+	pink: "from-[#FF72E1] to-[#F54C7A]",
+	foreground: "dark:from-[#FFFFFF] dark:to-[#4B4B4B]",
+}
+
 export const title = tv({
 	base: "tracking-tight inline font-semibold",
 	variants: {
@@ -13,9 +23,10 @@ export const title = tv({
 			foreground: "dark:from-[#FFFFFF] dark:to-[#4B4B4B]",
 		},
 		size: {
-			sm: "text-3xl lg:text-4xl",
+			sm: "text-xl lg:text-2xl",
 			md: "text-[2.3rem] lg:text-5xl leading-9",
 			lg: "text-4xl lg:text-6xl",
+			bmd: "text-[2.3rem] lg:text-5xl leading-9 font-bold",
 		},
 		fullWidth: {
 			true: "w-full block",
