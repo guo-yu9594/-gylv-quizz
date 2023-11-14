@@ -6,3 +6,8 @@ export type JoinData = {
 export type CreateData = {
   username: string;
 };
+
+export type NewPlayerData = {
+  id: string;
+  username: string;
+};
