@@ -1,7 +1,5 @@
-import express from "express";
+import { createServer } from "http";
 import { Server } from "socket.io";
-import http from "http";
-const router: any = express.Router();
 
 type JoinData = {
   username: string;
@@ -11,62 +9,52 @@ type CreateData = {
   username: string;
 };
 
-interface ServerToClientEvents {
+type ServerToClientEvents = {
   noArg: () => void;
   basicEmit: (a: number, b: string, c: Buffer) => void;
   withAck: (d: string, callback: (e: number) => void) => void;
 }
 
-interface ClientToServerEvents {
+type ClientToServerEvents = {
   hello: () => void;
   join: (data: JoinData, callback: any) => void;
   create: (data: CreateData, callback: any) => void;
 }
 
-interface InterServerEvents {
+type InterServerEvents = {
   ping: () => void;
 }
 
-interface SocketData {
+type SocketData = {
   name: string;
   age: number;
 }
 
-const app = express();
-const server = http.createServer(app);
-
-server.listen(4000, () => {
-  console.log("Server is listening on http://localhost:4000");
-});
-
+const port = process.env.SOCKET_PORT;
+const httpServer = createServer();
 const io = new Server<
   ClientToServerEvents,
   ServerToClientEvents,
   InterServerEvents,
   SocketData
->(server, {
+>(httpServer, {
   cors: {
     origin: "*",
   },
 });
 
 io.on("connection", (socket) => {
-  console.log(socket.id);
   socket.on("create", (data, callback) => {
-    callback(socket.id.slice(0, 6));
     console.log(data);
+    callback(socket.id.slice(0, 6));
     socket.join(socket.id.slice(0, 6));
   });
+
   socket.on("join", (data, callback) => {
     console.log(data);
-
     socket.join(data.roomId);
     callback("room " + data.roomId + " joined");
   });
-
-  // let useruuid: any = socket.handshake.query.user;
-  // socket.data.name = useruuid;
-  // let roomid: any = socket.handshake.query.room;
 
   socket.on("disconnect", (reason) => {
     console.log("User disconnected" + socket.id);
@@ -74,14 +62,6 @@ io.on("connection", (socket) => {
   });
 });
 
-router.post("/create/:username", (req, res) => {
-  const username: string = req.params.username;
-  if (!username) {
-    console.log(username);
-    return res.status(404).send("Please enter a username");
-  }
-  res.json({ result: true, username: username });
+httpServer.listen(port, () => {
+  console.log(`Server Socket.io is running at http://localhost:${port}`);
 });
-
-// router.post("/join", (req, res) => {});
-export default router;
