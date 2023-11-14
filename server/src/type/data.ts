@@ -11,3 +11,11 @@ export type NewPlayerData = {
   id: string;
   username: string;
 };
+
+export type CTSEndData = {
+  responses: number[];
+};
+
+export type STCStartData = {
+  questions: {question: string, options: string[]}[];
+};

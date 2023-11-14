@@ -58,6 +58,12 @@ io.on("connection", (socket) => {
     } else callback("error");
   });
 
+  socket.on("start", () => {
+  });
+
+  socket.on("end", (data) => {
+  });
+
   socket.on("disconnect", (reason) => {
     delete rooms[users[socket.id].roomId][socket.id];
     delete users[socket.id];
