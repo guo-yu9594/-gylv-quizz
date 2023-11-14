@@ -12,11 +12,17 @@ export type NewPlayerData = {
   username: string;
 };
 
+export type requestQuiz = {
+  subject: string;
+  roomId: string;
+};
+
 export type CTSEndData = {
   responses: number[];
 };
 
 export type STCStartData = {
-  roomId: string;
-  questions: { question: string; options: string[] }[];
+  // options: string;
+  questions: any;
+  // questions: {question: string, options: string[]}[];
 };

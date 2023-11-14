@@ -3,6 +3,7 @@ import {
   CTSEndData,
   JoinData,
   NewPlayerData,
+  requestQuiz,
   STCStartData,
 } from "./data";
 
@@ -11,14 +12,14 @@ export type ServerToClientEvents = {
   basicEmit: (a: number, b: string, c: Buffer) => void;
   withAck: (d: string, callback: (e: number) => void) => void;
   newPlayer: (data: NewPlayerData) => void;
-  start: (data: STCStartData) => void;
+  startServer: (data: STCStartData) => void;
 };
 
 export type ClientToServerEvents = {
   hello: () => void;
   join: (data: JoinData, callback: any) => void;
   create: (data: CreateData, callback: any) => void;
-  start: (data: STCStartData, callback: any) => void;
+  start: (data: requestQuiz, callback: any) => void;
   end: (data: CTSEndData, callback: any) => void;
 };
 

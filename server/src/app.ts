@@ -69,20 +69,20 @@ io.on("connection", (socket) => {
     responses: [],
   };
   let STCStartData: STCStartData = {
-    roomId: undefined,
-    questions: [],
+    // options: undefined,
+    questions: undefined,
   };
 
-  const createChatCompletion = async () => {
+  const createChatCompletion = async (data) => {
     const response = await openai.chat.completions.create({
       model: "gpt-3.5-turbo",
       // max_tokens: 350,
       messages: [
         {
           role: "system",
-          content: `Genere moi 5 question et reponses (4 par questions et une seule est bonne) sur le theme de la technologie d'une difficulte facile, je veux que ce soit en json composer de 2 tableau. 
+          content: `Genere moi 2 question et reponses (4 par questions et une seule est bonne) sur le theme de la technologie d'une difficulte facile, je veux que ce soit en json composer de 2 tableau. 
         le premier tableau compose d'une liste d'objet avec key "questions", chaque objet est compose d'une question ( key "question") de 4 reponses (key "options" ) sans la bonne reponses. les bonne reponses devront etre le second tableau sous forne de liste d'index (key "answers").
-        il me faut 5 questions et ne m'envoie que le json sans tes phrases inutile 
+        il me faut 2 questions et ne m'envoie que le json sans tes phrases inutile 
         exemple de ma structure :
         {
           questions: [
@@ -102,19 +102,29 @@ io.on("connection", (socket) => {
       ],
     });
     const formatResponseText = JSON.parse(response.choices[0].message.content);
-    STCStartData = formatResponseText.questions;
+    STCStartData = {
+      // options: formatResponseText.questions[0].options,
+      questions: formatResponseText.questions,
+    };
     CTSEndData = formatResponseText.answers;
     console.log("response", response);
   };
 
-  socket.on("start", async (data, callback) => {
-    io.to(data.roomId).emit("start", {
-      roomId: data.roomId,
-      questions: data.questions,
-    });
-    console.log("data", data, "Now waiting for OpenAI response");
-    await createChatCompletion();
-    callback(STCStartData);
+  socket.on("start", async (dataclient, callback) => {
+    console.log(
+      "dataclient.roomId: ",
+      dataclient.roomId,
+      "Now waiting for OpenAI response"
+    );
+    if (dataclient.roomId in rooms) {
+      await createChatCompletion(dataclient);
+      io.to(dataclient.roomId).emit("startServer", {
+        // roomId: dataclient.roomId,
+        // options: STCStartData,
+        questions: STCStartData,
+      });
+    } else callback("error");
+    // callback(STCStartData);
   });
 
   socket.on("end", (data) => {});
