@@ -1,21 +1,42 @@
-import express, { Express, Request, Response } from "express";
 import dotenv from "dotenv";
-import cors from "cors";
+import { createServer } from "http";
+import { Server } from "socket.io";
+import { ClientToServerEvents, InterServerEvents, ServerToClientEvents, SocketData } from "./type/server";
 
 dotenv.config();
-const app: Express = express();
+
 const port = process.env.PORT;
-
-app.use(cors());
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-
-app.get("/", (req: Request, res: Response) => {
-  res.send("Hello world from Gylz Quiz");
+const httpServer = createServer();
+const io = new Server<
+  ClientToServerEvents,
+  ServerToClientEvents,
+  InterServerEvents,
+  SocketData
+>(httpServer, {
+  cors: {
+    origin: "*",
+  },
 });
 
-app.listen(port, () => {
-  console.log(`⚡️[server]: Server is running at http://localhost:${port}`);
+io.on("connection", (socket) => {
+  socket.on("create", (data, callback) => {
+    console.log(data);
+    callback(socket.id.slice(0, 6));
+    socket.join(socket.id.slice(0, 6));
+  });
+
+  socket.on("join", (data, callback) => {
+    console.log(data);
+    socket.join(data.roomId);
+    callback("room " + data.roomId + " joined");
+  });
+
+  socket.on("disconnect", (reason) => {
+    console.log("User disconnected" + socket.id);
+    console.log(reason);
+  });
 });
 
-import "./socket/server"
+httpServer.listen(port, () => {
+  console.log(`Server Socket.io is running at http://localhost:${port}`);
+});
