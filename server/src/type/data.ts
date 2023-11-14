@@ -17,5 +17,6 @@ export type CTSEndData = {
 };
 
 export type STCStartData = {
-  questions: {question: string, options: string[]}[];
+  roomId: string;
+  questions: { question: string; options: string[] }[];
 };

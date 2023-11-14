@@ -8,6 +8,8 @@ import {
   SocketData,
 } from "./type/server";
 import { Rooms, Users } from "./type/session";
+import { OpenAI } from "openai";
+import { CTSEndData, STCStartData } from "./type/data";
 
 dotenv.config();
 
@@ -58,20 +60,74 @@ io.on("connection", (socket) => {
     } else callback("error");
   });
 
-  socket.on("start", () => {
+  const openai = new OpenAI({
+    apiKey: process.env.GTP_APIKEY,
+    // organization: process.env.ORGANIZATION_ID,
   });
 
-  socket.on("end", (data) => {
+  let CTSEndData: CTSEndData = {
+    responses: [],
+  };
+  let STCStartData: STCStartData = {
+    roomId: undefined,
+    questions: [],
+  };
+
+  const createChatCompletion = async () => {
+    const response = await openai.chat.completions.create({
+      model: "gpt-3.5-turbo",
+      // max_tokens: 350,
+      messages: [
+        {
+          role: "system",
+          content: `Genere moi 5 question et reponses (4 par questions et une seule est bonne) sur le theme de la technologie d'une difficulte facile, je veux que ce soit en json composer de 2 tableau. 
+        le premier tableau compose d'une liste d'objet avec key "questions", chaque objet est compose d'une question ( key "question") de 4 reponses (key "options" ) sans la bonne reponses. les bonne reponses devront etre le second tableau sous forne de liste d'index (key "answers").
+        il me faut 5 questions et ne m'envoie que le json sans tes phrases inutile 
+        exemple de ma structure :
+        {
+          questions: [
+            {
+              question: "",
+              options: [...]
+            },
+            {
+              question: "",
+              options: [...]
+            },
+            ...
+          ],
+          answers: [...]
+        }`,
+        },
+      ],
+    });
+    const formatResponseText = JSON.parse(response.choices[0].message.content);
+    STCStartData = formatResponseText.questions;
+    CTSEndData = formatResponseText.answers;
+    console.log("response", response);
+  };
+
+  socket.on("start", async (data, callback) => {
+    io.to(data.roomId).emit("start", {
+      roomId: data.roomId,
+      questions: data.questions,
+    });
+    console.log("data", data, "Now waiting for OpenAI response");
+    await createChatCompletion();
+    callback(STCStartData);
   });
+
+  socket.on("end", (data) => {});
 
   socket.on("disconnect", (reason) => {
-    delete rooms[users[socket.id].roomId][socket.id];
+    if (users[socket.id] && rooms[users[socket.id].roomId] !== undefined) {
+      delete rooms[users[socket.id].roomId][socket.id];
+    }
     delete users[socket.id];
     console.log(`User ${socket.id} disconnected`);
     console.log(reason);
   });
 });
-
 httpServer.listen(port, () => {
   console.log(`Server Socket.io is running at http://localhost:${port}`);
 });

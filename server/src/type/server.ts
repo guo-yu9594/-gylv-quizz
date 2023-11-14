@@ -1,4 +1,10 @@
-import { CreateData, CTSEndData, JoinData, NewPlayerData, STCStartData } from "./data";
+import {
+  CreateData,
+  CTSEndData,
+  JoinData,
+  NewPlayerData,
+  STCStartData,
+} from "./data";
 
 export type ServerToClientEvents = {
   noArg: () => void;
@@ -12,8 +18,8 @@ export type ClientToServerEvents = {
   hello: () => void;
   join: (data: JoinData, callback: any) => void;
   create: (data: CreateData, callback: any) => void;
-  start: () => void;
-  end: (data: CTSEndData) => void;
+  start: (data: STCStartData, callback: any) => void;
+  end: (data: CTSEndData, callback: any) => void;
 };
 
 export type InterServerEvents = {
