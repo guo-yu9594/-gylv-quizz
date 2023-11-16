@@ -10,6 +10,7 @@ import {
 import { Rooms, Users } from "./type/session";
 import { OpenAI } from "openai";
 import { CTSEndData, STCStartData } from "./type/data";
+import e from "cors";
 
 dotenv.config();
 
@@ -35,6 +36,7 @@ io.on("connection", (socket) => {
     users[socket.id] = {
       username: data.username,
       roomId,
+      inTest: false,
     };
     rooms[roomId] = { [socket.id]: users[socket.id] };
     socket.join(roomId);
@@ -46,6 +48,7 @@ io.on("connection", (socket) => {
       users[socket.id] = {
         username: data.username,
         roomId: data.roomId,
+        inTest: false,
       };
       rooms[data.roomId] = {
         ...rooms[data.roomId],
@@ -56,6 +59,7 @@ io.on("connection", (socket) => {
         username: data.username,
         id: socket.id,
       });
+
       callback(rooms);
     } else callback("error");
   });
@@ -65,7 +69,7 @@ io.on("connection", (socket) => {
     // organization: process.env.ORGANIZATION_ID,
   });
 
-  let CTSEndData: CTSEndData = {};
+  const CTSEndData: CTSEndData = {};
 
   let STCStartData: STCStartData = {
     questions: undefined,
@@ -119,6 +123,9 @@ io.on("connection", (socket) => {
       "Now waiting for OpenAI response"
     );
     if (dataClient.roomId in rooms) {
+      Object.keys(rooms[dataClient.roomId]).forEach((userId) => {
+        rooms[dataClient.roomId][userId].inTest = true;
+      });
       await createChatCompletion(dataClient);
       io.to(dataClient.roomId).emit("startServer", {
         // roomId: dataclient.roomId,
@@ -129,11 +136,25 @@ io.on("connection", (socket) => {
   });
 
   socket.on("end", (dataClient) => {
-    console.log("dataClient", dataClient);
+    console.log("rooms", rooms);
     if (dataClient.roomId in rooms) {
-      io.to(dataClient.roomId).emit("giveResponseServer", {
-        response: CTSEndData[dataClient.roomId].response,
-      });
+      if (dataClient.userId in rooms[dataClient.roomId]) {
+        rooms[dataClient.roomId][dataClient.userId].inTest = false;
+
+        if (
+          Object.keys(rooms[dataClient.roomId]).find(
+            (userId) => rooms[dataClient.roomId][userId].inTest == true
+          )
+        ) {
+          console.log("find users on test");
+        } else {
+          console.log("send response test");
+          io.to(dataClient.roomId).emit("giveResponseServer", {
+            response: CTSEndData[dataClient.roomId].response,
+            // answers: { response: CTSEndData[dataClient.roomId].response },
+          });
+        }
+      }
     }
   });
 
