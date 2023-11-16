@@ -132,7 +132,7 @@ io.on("connection", (socket) => {
     console.log("dataClient", dataClient);
     if (dataClient.roomId in rooms) {
       io.to(dataClient.roomId).emit("giveResponseServer", {
-        answer: CTSEndData[dataClient.roomId].response,
+        response: CTSEndData[dataClient.roomId].response,
       });
     }
   });

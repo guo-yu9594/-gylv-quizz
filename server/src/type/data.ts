@@ -23,13 +23,13 @@ export type requestResponseQuiz = {
 
 export type CTSEndData = {
   // responses: number[];
-  [customKey: string]: answers;
+  [customKey: string]: { response: any };
 };
 
 export type answers = {
   // roomId: string;
-  // response: number[];
-  response: any;
+  response: number[];
+  // response: any;
 };
 
 export type STCStartData = {
