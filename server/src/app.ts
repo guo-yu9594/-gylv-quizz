@@ -65,11 +65,9 @@ io.on("connection", (socket) => {
     // organization: process.env.ORGANIZATION_ID,
   });
 
-  let CTSEndData: CTSEndData = {
-    responses: [],
-  };
+  let CTSEndData: CTSEndData = {};
+
   let STCStartData: STCStartData = {
-    // options: undefined,
     questions: undefined,
   };
 
@@ -106,28 +104,38 @@ io.on("connection", (socket) => {
       // options: formatResponseText.questions[0].options,
       questions: formatResponseText.questions,
     };
-    CTSEndData = formatResponseText.answers;
+    // CTSEndData = formatResponseText.answers;
+    CTSEndData[data.roomId] = {
+      ...response,
+      response: formatResponseText.answers,
+    };
     console.log("response", response);
   };
 
-  socket.on("start", async (dataclient, callback) => {
+  socket.on("start", async (dataClient, callback) => {
     console.log(
-      "dataclient.roomId: ",
-      dataclient.roomId,
+      "dataClient.roomId: ",
+      dataClient.roomId,
       "Now waiting for OpenAI response"
     );
-    if (dataclient.roomId in rooms) {
-      await createChatCompletion(dataclient);
-      io.to(dataclient.roomId).emit("startServer", {
+    if (dataClient.roomId in rooms) {
+      await createChatCompletion(dataClient);
+      io.to(dataClient.roomId).emit("startServer", {
         // roomId: dataclient.roomId,
         // options: STCStartData,
         questions: STCStartData,
       });
-    } else callback("error");
-    // callback(STCStartData);
+    } else callback("error creating chat completion");
   });
 
-  socket.on("end", (data) => {});
+  socket.on("end", (dataClient) => {
+    console.log("dataClient", dataClient);
+    if (dataClient.roomId in rooms) {
+      io.to(dataClient.roomId).emit("giveResponseServer", {
+        answer: CTSEndData[dataClient.roomId].response,
+      });
+    }
+  });
 
   socket.on("disconnect", (reason) => {
     if (users[socket.id] && rooms[users[socket.id].roomId] !== undefined) {

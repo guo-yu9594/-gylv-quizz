@@ -17,8 +17,19 @@ export type requestQuiz = {
   roomId: string;
 };
 
+export type requestResponseQuiz = {
+  roomId: string;
+};
+
 export type CTSEndData = {
-  responses: number[];
+  // responses: number[];
+  [customKey: string]: answers;
+};
+
+export type answers = {
+  // roomId: string;
+  // response: number[];
+  response: any;
 };
 
 export type STCStartData = {
