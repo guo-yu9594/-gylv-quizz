@@ -117,17 +117,18 @@ io.on("connection", (socket) => {
   };
 
   socket.on("start", async (dataClient, callback) => {
+    const clientRoomId = dataClient.roomId;
     console.log(
       "dataClient.roomId: ",
       dataClient.roomId,
       "Now waiting for OpenAI response"
     );
-    if (dataClient.roomId in rooms) {
-      Object.keys(rooms[dataClient.roomId]).forEach((userId) => {
-        rooms[dataClient.roomId][userId].inTest = true;
+    if (clientRoomId in rooms) {
+      Object.keys(rooms[clientRoomId]).forEach((userId) => {
+        rooms[clientRoomId][userId].inTest = true;
       });
       await createChatCompletion(dataClient);
-      io.to(dataClient.roomId).emit("startServer", {
+      io.to(clientRoomId).emit("startServer", {
         // roomId: dataclient.roomId,
         // options: STCStartData,
         questions: STCStartData,
@@ -136,23 +137,27 @@ io.on("connection", (socket) => {
   });
 
   socket.on("end", (dataClient) => {
+    const clientRoomId = dataClient.roomId;
+    const clientUserId = dataClient.userId;
     console.log("rooms", rooms);
-    if (dataClient.roomId in rooms) {
-      if (dataClient.userId in rooms[dataClient.roomId]) {
-        rooms[dataClient.roomId][dataClient.userId].inTest = false;
+    console.log("dataClient", dataClient);
+
+    if (clientRoomId in rooms) {
+      if (clientUserId in rooms[clientRoomId]) {
+        rooms[clientRoomId][clientUserId].inTest = false;
 
         if (
-          Object.keys(rooms[dataClient.roomId]).find(
-            (userId) => rooms[dataClient.roomId][userId].inTest == true
+          Object.keys(rooms[clientRoomId]).find(
+            (userId) => rooms[clientRoomId][userId].inTest == true
           )
         ) {
           console.log("find users on test");
         } else {
           console.log("send response test");
-          io.to(dataClient.roomId).emit("giveResponseServer", {
-            response: CTSEndData[dataClient.roomId].response,
-            // answers: { response: CTSEndData[dataClient.roomId].response },
-          });
+          // io.to(dataClient.roomId).emit("giveResponseServer", {
+          //   response: CTSEndData[dataClient.roomId].response,
+          //   // answers: { response: CTSEndData[dataClient.roomId].response },
+          // });
         }
       }
     }
