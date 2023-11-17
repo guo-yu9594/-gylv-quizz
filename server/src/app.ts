@@ -131,7 +131,7 @@ io.on("connection", (socket) => {
       io.to(clientRoomId).emit("startServer", {
         // roomId: dataclient.roomId,
         // options: STCStartData,
-        questions: STCStartData,
+        questions: STCStartData.questions,
       });
     } else callback("error creating chat completion");
   });
@@ -154,10 +154,10 @@ io.on("connection", (socket) => {
           console.log("find users on test");
         } else {
           console.log("send response test");
-          // io.to(dataClient.roomId).emit("giveResponseServer", {
-          //   response: CTSEndData[dataClient.roomId].response,
-          //   // answers: { response: CTSEndData[dataClient.roomId].response },
-          // });
+          io.to(clientRoomId).emit("giveResponseServer", {
+            response: CTSEndData[clientRoomId].response,
+            // answers: { response: CTSEndData[dataClient.roomId].response },
+          });
         }
       }
     }
