@@ -12,30 +12,21 @@ export type NewPlayerData = {
   username: string;
 };
 
-export type requestQuiz = {
+export type CTSStartData = {
   subject: string;
   roomId: string;
 };
 
-export type requestResponseQuiz = {
+export type CTSEndData = {
   roomId: string;
   userId: string;
   response: number[];
 };
 
-export type CTSEndData = {
-  [customKey: string]: { response: any };
-  // [customKey: string]: answers;
-  // [customKey: string]: answers;
-};
-export type answers = {
-  // roomId: string;
-  response: number[];
-  // response: any;
+export type STCEndData = {
+  answers: number[];
 };
 
 export type STCStartData = {
-  // options: string;
   questions: any;
-  // questions: {question: string, options: string[]}[];
 };

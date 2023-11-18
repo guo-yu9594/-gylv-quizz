@@ -7,3 +7,5 @@ export type Users = {
 };
 
 export type Rooms = { [roomId: string]: Users };
+
+export type Answers = { [roomId: string]: number[] };
