@@ -25,6 +25,15 @@ export type CTSEndData = {
 
 export type STCEndData = {
   answers: number[];
+  results?: {
+    rank: number;
+    grade: number;
+    ranking: {
+      rank: number;
+      username: string;
+      grade: number;
+    }[];
+  };
 };
 
 export type STCStartData = {
