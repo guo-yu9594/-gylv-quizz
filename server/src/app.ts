@@ -59,7 +59,7 @@ io.on("connection", (socket) => {
     socket.join(roomId);
     callback(roomId);
     console.log(
-      `Room ${roomId} successfully created and joined by player "${data.username}" ID ${socket.id}.`
+      `Room ${roomId} successfully created and joined by player "${data.username}" with ID ${socket.id}.`
     );
   });
 
@@ -82,7 +82,7 @@ io.on("connection", (socket) => {
 
       callback(rooms);
       console.log(
-        `Room ${data.roomId} successfully joined by player "${data.username}" ID ${socket.id}.`
+        `Room ${data.roomId} successfully joined by player "${data.username}" with ID ${socket.id}.`
       );
     } else callback("error");
   });
@@ -147,7 +147,7 @@ io.on("connection", (socket) => {
       delete rooms[users[socket.id].roomId][socket.id];
     }
     delete users[socket.id];
-    console.log(`User ${socket.id} disconnected. Reason: ${reason}.`);
+    console.log(`Player ${socket.id} disconnected. Reason: ${reason}.`);
   });
 });
 httpServer.listen(port, () => {
