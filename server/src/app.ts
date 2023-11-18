@@ -46,6 +46,8 @@ let rooms: Rooms = {};
 let answers: Answers = {};
 
 io.on("connection", (socket) => {
+  console.log(`Player with ID ${socket.id} has been connected.`)
+
   socket.on("create", (data, callback) => {
     const roomId = socket.id.slice(0, 6);
     users[socket.id] = {
@@ -57,7 +59,7 @@ io.on("connection", (socket) => {
     socket.join(roomId);
     callback(roomId);
     console.log(
-      `Room ${roomId} successfully created and joinded by player "${data.username}" ID ${socket.id}`
+      `Room ${roomId} successfully created and joined by player "${data.username}" ID ${socket.id}.`
     );
   });
 
@@ -80,7 +82,7 @@ io.on("connection", (socket) => {
 
       callback(rooms);
       console.log(
-        `Room ${data.roomId} successfully joined by player "${data.username}" ID ${socket.id}`
+        `Room ${data.roomId} successfully joined by player "${data.username}" ID ${socket.id}.`
       );
     } else callback("error");
   });
@@ -145,8 +147,7 @@ io.on("connection", (socket) => {
       delete rooms[users[socket.id].roomId][socket.id];
     }
     delete users[socket.id];
-    console.log(`User ${socket.id} disconnected`);
-    console.log(reason);
+    console.log(`User ${socket.id} disconnected. Reason: ${reason}.`);
   });
 });
 httpServer.listen(port, () => {
