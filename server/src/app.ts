@@ -26,6 +26,21 @@ const io = new Server<
   },
 });
 
+const openai = new OpenAI({
+  apiKey: process.env.GTP_APIKEY,
+  // organization: process.env.ORGANIZATION_ID,
+});
+
+const createChatCompletion = async (data): Promise<any> => {
+  const response = await openai.chat.completions.create({
+    model: "gpt-3.5-turbo",
+    // max_tokens: 350,
+    messages: aiConfigMessages,
+  });
+  const formatResponseText = JSON.parse(response.choices[0].message.content);
+  return formatResponseText;
+};
+
 let users: Users = {};
 let rooms: Rooms = {};
 let answers: Answers = {};
@@ -41,6 +56,9 @@ io.on("connection", (socket) => {
     rooms[roomId] = { [socket.id]: users[socket.id] };
     socket.join(roomId);
     callback(roomId);
+    console.log(
+      `Room ${roomId} successfully created and joinded by player "${data.username}" ID ${socket.id}`
+    );
   });
 
   socket.on("join", (data, callback) => {
@@ -61,48 +79,41 @@ io.on("connection", (socket) => {
       });
 
       callback(rooms);
+      console.log(
+        `Room ${data.roomId} successfully joined by player "${data.username}" ID ${socket.id}`
+      );
     } else callback("error");
   });
 
-  const openai = new OpenAI({
-    apiKey: process.env.GTP_APIKEY,
-    // organization: process.env.ORGANIZATION_ID,
-  });
-
-  const createChatCompletion = async (data): Promise<any> => {
-    const response = await openai.chat.completions.create({
-      model: "gpt-3.5-turbo",
-      // max_tokens: 350,
-      messages: aiConfigMessages,
-    });
-    const formatResponseText = JSON.parse(response.choices[0].message.content);
-    return formatResponseText;
-  };
-
   socket.on("start", async (dataClient, callback) => {
     const clientRoomId = dataClient.roomId;
-    console.log(
-      "dataClient.roomId: ",
-      dataClient.roomId,
-      "Now waiting for OpenAI response"
-    );
+    console.log(`Room ${dataClient.roomId} waiting for OpenAI response.`);
     if (clientRoomId in rooms) {
       Object.keys(rooms[clientRoomId]).forEach((userId) => {
         rooms[clientRoomId][userId].inTest = true;
       });
-      const quiz = await createChatCompletion(dataClient);
-      io.to(clientRoomId).emit("start", {
-        questions: quiz.questions,
-      });
-      answers[clientRoomId] = quiz.answers;
+      createChatCompletion(dataClient).then(
+        (res) => {
+          io.to(clientRoomId).emit("start", {
+            questions: res.questions,
+          });
+          answers[clientRoomId] = res.answers;
+          console.log(
+            `Quiz content successfully generated and sent for room ${dataClient.roomId}.`
+          );
+        },
+        (err) => {
+          console.error(
+            `Failed to generate quiz content for room ${dataClient.roomId}.`
+          );
+        }
+      );
     } else callback("error creating chat completion");
   });
 
   socket.on("end", (dataClient) => {
     const clientRoomId = dataClient.roomId;
     const clientUserId = dataClient.userId;
-    console.log("rooms", rooms);
-    console.log("dataClient", dataClient);
 
     if (clientRoomId in rooms) {
       if (clientUserId in rooms[clientRoomId]) {
@@ -113,13 +124,17 @@ io.on("connection", (socket) => {
             (userId) => rooms[clientRoomId][userId].inTest == true
           )
         ) {
-          console.log("find users on test");
+          console.log(
+            `Player ${clientUserId} responses submitted to room ${clientRoomId}, waiting for other players submitting...`
+          );
         } else {
-          console.log("send response test");
           io.to(clientRoomId).emit("end", {
             answers: answers[clientRoomId],
           });
           delete answers[clientRoomId];
+          console.log(
+            `Player ${clientUserId} responses submitted to room ${clientRoomId}, all room players submitted. Results sent.`
+          );
         }
       }
     }
