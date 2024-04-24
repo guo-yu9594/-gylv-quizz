@@ -26,8 +26,9 @@ const io = new Server<
   },
 });
 
+
 const openai = new OpenAI({
-  apiKey: process.env.GTP_APIKEY,
+  apiKey: process.env.OPENAI_API_KEY,
   // organization: process.env.ORGANIZATION_ID,
 });
 
@@ -108,14 +109,15 @@ io.on("connection", (socket) => {
           console.error(
             `Failed to generate quiz content for room ${dataClient.roomId}.`
           );
+          console.error(err);
         }
       );
-    } else callback("error creating chat completion");
+    } else callback("start error");
   });
 
   socket.on("end", (dataClient) => {
-    const clientRoomId = dataClient.roomId;
-    const clientUserId = dataClient.userId;
+    const clientRoomId = users[socket.id].roomId;
+    const clientUserId = socket.id;
 
     if (clientRoomId in rooms) {
       if (clientUserId in rooms[clientRoomId]) {

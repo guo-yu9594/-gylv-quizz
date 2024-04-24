@@ -18,8 +18,6 @@ export type CTSStartData = {
 };
 
 export type CTSEndData = {
-  roomId: string;
-  userId: string;
   response: number[];
 };
 
