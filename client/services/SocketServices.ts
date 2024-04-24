@@ -1,3 +1,4 @@
+import { ResSelectType } from "@/app/components/Quiz";
 import io, { Socket } from "socket.io-client";
 
 export default class SocketServices {
@@ -11,19 +12,23 @@ export default class SocketServices {
       autoConnect: false,
     });
     this.socket.connect();
-    this.socket.on("newPlayer", (data) => {
-      console.log("new player");
-      console.log(data);
-    });
-    this.socket.on("start", (data) => {
-      console.log("it has started");
-      console.log(data);
-    });
-    this.socket.on("end", (data) => {
-      console.log("it is the end");
-      console.log(data);
-    });
+    // this.socket.on("newPlayer", (data) => {
+    //   console.log("new player");
+    //   console.log(data);
+    // });
+    // this.socket.on("start", (data) => {
+    //   console.log("it has started");
+    //   console.log(data);
+    // });
+    // this.socket.on("end", (data) => {
+    //   console.log("it is the end");
+    //   console.log(data);
+    // });
   }
+
+  on = (eventName: string, callback: any) => {
+    this.socket.on(eventName, callback);
+  };
 
   single = () => {
     this.socket.emit("create", { username: this.username }, (res: any) => {
@@ -61,11 +66,12 @@ export default class SocketServices {
     );
   };
 
-  end = () => {
+  end = (responses: ResSelectType) => {
     console.log(this.userId);
 
-    this.socket.emit("end", { response: [0, 1] }, (res: any) => {
-      // console.log(response);
+    this.socket.emit("end", { response: responses.res }, (res: any) => {
+      console.log("end callback");
+      console.log(res);
     });
   };
 }
