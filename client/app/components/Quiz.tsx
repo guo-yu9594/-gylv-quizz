@@ -54,7 +54,7 @@ const progessRefreshTime: number = 50;
 
 type QuizProps = {
   content: QuizContent;
-  handleEnd: (responses: ResSelectType) => void;
+  handleEnd: (answers: number[]) => void;
 };
 
 const Quiz: React.FC<QuizProps> = ({ content, handleEnd }) => {
@@ -95,7 +95,7 @@ const Quiz: React.FC<QuizProps> = ({ content, handleEnd }) => {
   }, []);
 
   useEffect(() => {
-    if (responses.res.length === content.questions.length) handleEnd(responses);
+    if (responses.res.length === content.questions.length) handleEnd(responses.res);
   }, [responses]);
 
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
@@ -106,6 +106,7 @@ const Quiz: React.FC<QuizProps> = ({ content, handleEnd }) => {
     >
       <Progress
         size="lg"
+        aria-label="Progress"
         value={(clock / (msPerQuestion - 600)) * 100}
         color={palette[currentColorIndex].color}
         className="w-full"

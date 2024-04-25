@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import SocketServices from "@/services/SocketServices";
 import Loading from "../components/Loading";
 import Show from "@/components/Show";
-import { QuizContent } from "@/types";
+import { QuizContent, STCEndData, STCStartData } from "@/types";
 import ResultModal from "../components/ResultModal";
 
 const socket = new SocketServices();
@@ -15,22 +15,21 @@ export default function Single() {
   const [isLoading, setIsLoading] = useState(true);
   const [questions, setQuestions] = useState<QuizContent>();
   const [showResult, setShowResult] = useState(false);
+  const [results, setResults] = useState<STCEndData>();
 
-  const handleEnd = (responses: ResSelectType) => {
-    socket.end(responses);
+  const handleEnd = (answers: number[]) => {
+    socket.end(answers);
     setIsLoading(true);
   };
 
   useEffect(() => {
-    socket.on("start", (data: any) => {
-      console.log(data);
+    socket.on("start", (data: STCStartData) => {
       setIsLoading(false);
       setQuestions(data);
     });
-    socket.on("end", (data: any) => {
+    socket.on("end", (data: STCEndData) => {
       setShowResult(true);
-      console.log("end result");
-      console.log(data);
+      setResults(data);
     });
     socket.single();
   }, []);
@@ -43,7 +42,7 @@ export default function Single() {
       <Show active={!isLoading}>
         <Quiz content={questions as QuizContent} handleEnd={handleEnd} />
       </Show>
-      <ResultModal open={showResult} />
+      <ResultModal open={showResult} data={results} />
     </section>
   );
 }

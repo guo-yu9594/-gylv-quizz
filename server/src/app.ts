@@ -7,7 +7,7 @@ import {
   ServerToClientEvents,
   SocketData,
 } from "./type/server";
-import { Answers, Rooms, Users } from "./type/session";
+import { Answers, Result, Rooms, Users } from "./type/session";
 import { OpenAI } from "openai";
 import { aiConfigMessages } from "./config/ai";
 
@@ -26,11 +26,14 @@ const io = new Server<
   },
 });
 
-
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
   // organization: process.env.ORGANIZATION_ID,
 });
+
+let users: Users = {};
+let rooms: Rooms = {};
+let answers: Answers = {};
 
 const createChatCompletion = async (data): Promise<any> => {
   const response = await openai.chat.completions.create({
@@ -42,12 +45,38 @@ const createChatCompletion = async (data): Promise<any> => {
   return formatResponseText;
 };
 
-let users: Users = {};
-let rooms: Rooms = {};
-let answers: Answers = {};
+const getScores = (expectedAnswers: number[], roomUsers: Users): Result[] => {
+  let scores: Result[] = [];
+
+  for (const id in roomUsers) {
+    let score = 0;
+    for (let i = 0; i < roomUsers[id].answers.length; i++)
+      if (roomUsers[id].answers[i] === expectedAnswers[i]) score++;
+    scores.push({
+      username: roomUsers[id].username,
+      id,
+      score,
+      rank: 1,
+    });
+  }
+  return scores.sort((a, b) => a.score - b.score);
+};
+
+const compileResults = (roomId: string): Result[] => {
+  const roomUsers = rooms[roomId]; // yes it get the users of the room
+  const expectedAnswers = answers[roomId];
+  let scores = getScores(expectedAnswers, roomUsers);
+  let rank = 1;
+
+  for (let i = 1; i < scores.length; i++) {
+    if (scores[i].score > scores[i - 1].score) rank++;
+    scores[i].rank = rank;
+  }
+  return scores;
+};
 
 io.on("connection", (socket) => {
-  console.log(`Player with ID ${socket.id} has been connected.`)
+  console.log(`Player with ID ${socket.id} has been connected.`);
 
   socket.on("create", (data, callback) => {
     const roomId = socket.id.slice(0, 6);
@@ -122,7 +151,7 @@ io.on("connection", (socket) => {
     if (clientRoomId in rooms) {
       if (clientUserId in rooms[clientRoomId]) {
         rooms[clientRoomId][clientUserId].inTest = false;
-
+        rooms[clientRoomId][clientUserId].answers = dataClient.answers;
         if (
           Object.keys(rooms[clientRoomId]).find(
             (userId) => rooms[clientRoomId][userId].inTest == true
@@ -134,6 +163,7 @@ io.on("connection", (socket) => {
         } else {
           io.to(clientRoomId).emit("end", {
             answers: answers[clientRoomId],
+            results: compileResults(clientRoomId)
           });
           delete answers[clientRoomId];
           console.log(

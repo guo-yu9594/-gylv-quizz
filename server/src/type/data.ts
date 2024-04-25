@@ -1,3 +1,5 @@
+import { Result } from "./session";
+
 export type JoinData = {
   username: string;
   roomId: string;
@@ -18,20 +20,12 @@ export type CTSStartData = {
 };
 
 export type CTSEndData = {
-  response: number[];
+  answers: number[];
 };
 
 export type STCEndData = {
   answers: number[];
-  results?: {
-    rank: number;
-    grade: number;
-    ranking: {
-      rank: number;
-      username: string;
-      grade: number;
-    }[];
-  };
+  results?: Result[];
 };
 
 export type STCStartData = {

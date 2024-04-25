@@ -1,6 +1,7 @@
 "use client";
 
 import { title } from "@/components/primitives";
+import { STCEndData } from "@/types";
 import {
   Button,
   Link,
@@ -19,9 +20,24 @@ import {
 
 type ResultModalProps = {
   open: boolean;
+  data: STCEndData | undefined;
 };
 
-const ResultModal: React.FC<ResultModalProps> = ({ open }) => {
+const ResultModal: React.FC<ResultModalProps> = ({ open, data }) => {
+  if (!data || !data.results) return null;
+
+  const rows = data.results.map((user) => {
+    return (
+      <TableRow key={user.id}>
+        <TableCell>{user.rank}</TableCell>
+        <TableCell>{user.username}</TableCell>
+        <TableCell>
+          {user.score}/{data.answers.length}
+        </TableCell>
+      </TableRow>
+    );
+  });
+
   return (
     <Modal
       isOpen={open}
@@ -45,13 +61,7 @@ const ResultModal: React.FC<ResultModalProps> = ({ open }) => {
                   <TableColumn>NAME</TableColumn>
                   <TableColumn>SCORE</TableColumn>
                 </TableHeader>
-                <TableBody>
-                  <TableRow key="1">
-                    <TableCell>1</TableCell>
-                    <TableCell>Tony Reichert</TableCell>
-                    <TableCell>11/15</TableCell>
-                  </TableRow>
-                </TableBody>
+                <TableBody>{rows}</TableBody>
               </Table>
             </ModalBody>
             <ModalFooter className="flex flex-col items-center">
