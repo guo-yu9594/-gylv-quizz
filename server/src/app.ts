@@ -54,7 +54,7 @@ const createChatCompletion = async (): Promise<any> => {
   const response = await openai.chat.completions.create({
     model: "gpt-3.5-turbo",
     // max_tokens: 350,
-    messages: aiConfigMessages(10, "general culture"),
+    messages: aiConfigMessages(10, "general culture", "easy"),
   });
   const formatResponseText = JSON.parse(response.choices[0].message.content);
   return formatResponseText;
