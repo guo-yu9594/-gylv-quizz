@@ -19,3 +19,11 @@ export type Result = {
   username: string;
   score: number;
 };
+
+export type QuizData = {
+  questions: {
+    question: string,
+    options: string[]
+  }[],
+  answers: number[]
+}

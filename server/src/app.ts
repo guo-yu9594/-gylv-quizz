@@ -7,7 +7,7 @@ import {
   ServerToClientEvents,
   SocketData,
 } from "./type/server";
-import { Answers, Result, Rooms, Users } from "./type/session";
+import { Answers, QuizData, Result, Rooms, Users } from "./type/session";
 import { OpenAI } from "openai";
 import { aiConfigMessages } from "./config/ai";
 
@@ -34,8 +34,9 @@ const openai = new OpenAI({
 let users: Users = {};
 let rooms: Rooms = {};
 let answers: Answers = {};
+let quizQueue: QuizData[] = [];
 
-const createChatCompletion = async (data): Promise<any> => {
+const createChatCompletion = async (): Promise<any> => {
   const response = await openai.chat.completions.create({
     model: "gpt-3.5-turbo",
     // max_tokens: 350,
@@ -43,6 +44,37 @@ const createChatCompletion = async (data): Promise<any> => {
   });
   const formatResponseText = JSON.parse(response.choices[0].message.content);
   return formatResponseText;
+};
+
+const queueQuiz = () => {
+  if (quizQueue.length < 5) {
+    createChatCompletion().then(
+      (res) => {
+        quizQueue.push(res);
+        console.log(
+          `Quiz content successfully queued, position in the queue: ${
+            quizQueue.length - 1
+          }`
+        );
+        queueQuiz();
+      },
+      (err) => {
+        console.error(`Failed to generate quiz content for queing`);
+        console.error(err);
+      }
+    );
+  }
+};
+
+const getQuiz = async (roomId: string): Promise<any> => {
+  if (quizQueue.length > 0) {
+    const quiz = quizQueue.shift();
+    queueQuiz();
+    return quiz;
+  } else {
+    const quiz = await createChatCompletion();
+    return quiz;
+  }
 };
 
 const getScores = (expectedAnswers: number[], roomUsers: Users): Result[] => {
@@ -124,23 +156,21 @@ io.on("connection", (socket) => {
       Object.keys(rooms[clientRoomId]).forEach((userId) => {
         rooms[clientRoomId][userId].inTest = true;
       });
-      createChatCompletion(dataClient).then(
-        (res) => {
-          io.to(clientRoomId).emit("start", {
-            questions: res.questions,
-          });
-          answers[clientRoomId] = res.answers;
-          console.log(
-            `Quiz content successfully generated and sent for room ${dataClient.roomId}.`
-          );
-        },
-        (err) => {
-          console.error(
-            `Failed to generate quiz content for room ${dataClient.roomId}.`
-          );
-          console.error(err);
-        }
-      );
+      try {
+        const quiz = await getQuiz(dataClient.roomId);
+        io.to(clientRoomId).emit("start", {
+          questions: quiz.questions,
+        });
+        answers[clientRoomId] = quiz.answers;
+        console.log(
+          `Quiz content successfully generated and sent for room ${dataClient.roomId}.`
+        );
+      } catch (err) {
+        console.error(
+          `Failed to generate quiz content for room ${dataClient.roomId}.`
+        );
+        console.error(err);
+      }
     } else callback("start error");
   });
 
@@ -163,7 +193,7 @@ io.on("connection", (socket) => {
         } else {
           io.to(clientRoomId).emit("end", {
             answers: answers[clientRoomId],
-            results: compileResults(clientRoomId)
+            results: compileResults(clientRoomId),
           });
           delete answers[clientRoomId];
           console.log(
@@ -185,3 +215,5 @@ io.on("connection", (socket) => {
 httpServer.listen(port, () => {
   console.log(`Server Socket.io is running at http://localhost:${port}`);
 });
+
+queueQuiz();
