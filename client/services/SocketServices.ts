@@ -8,7 +8,7 @@ export default class SocketServices {
   public username: string = "You";
 
   constructor() {
-    this.socket = io("http://localhost:3001", {
+    this.socket = io("https://gylv-quiz.onrender.com", {
       autoConnect: false,
     });
     this.socket.connect();
