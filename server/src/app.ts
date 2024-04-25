@@ -36,11 +36,25 @@ let rooms: Rooms = {};
 let answers: Answers = {};
 let quizQueue: QuizData[] = [];
 
+const checkQuiz = (quiz: any) => {
+  if (
+    "questions" in quiz &&
+    "answers" in quiz &&
+    typeof quiz.answers[0] == "number" &&
+    "question" in quiz.questions[0] &&
+    "options" in quiz.questions[0] &&
+    typeof quiz.questions[0].question == "string" &&
+    typeof quiz.questions[0].options[0] == "string"
+  )
+    return true;
+  else return false;
+};
+
 const createChatCompletion = async (): Promise<any> => {
   const response = await openai.chat.completions.create({
     model: "gpt-3.5-turbo",
     // max_tokens: 350,
-    messages: aiConfigMessages,
+    messages: aiConfigMessages(5, "technology"),
   });
   const formatResponseText = JSON.parse(response.choices[0].message.content);
   return formatResponseText;
@@ -50,12 +64,14 @@ const queueQuiz = () => {
   if (quizQueue.length < 5) {
     createChatCompletion().then(
       (res) => {
-        quizQueue.push(res);
-        console.log(
-          `Quiz content successfully queued, position in the queue: ${
-            quizQueue.length - 1
-          }`
-        );
+        if (checkQuiz(res)) {
+          quizQueue.push(res);
+          console.log(
+            `Quiz content successfully generated and queued, position in the queue: ${
+              quizQueue.length - 1
+            }`
+          );
+        }
         queueQuiz();
       },
       (err) => {
@@ -73,6 +89,7 @@ const getQuiz = async (roomId: string): Promise<any> => {
     return quiz;
   } else {
     const quiz = await createChatCompletion();
+    if (checkQuiz(quiz)) return getQuiz(roomId);
     return quiz;
   }
 };
@@ -163,11 +180,11 @@ io.on("connection", (socket) => {
         });
         answers[clientRoomId] = quiz.answers;
         console.log(
-          `Quiz content successfully generated and sent for room ${dataClient.roomId}.`
+          `Quiz content successfully gotted and sent for room ${dataClient.roomId}.`
         );
       } catch (err) {
         console.error(
-          `Failed to generate quiz content for room ${dataClient.roomId}.`
+          `Failed to get quiz content for room ${dataClient.roomId}.`
         );
         console.error(err);
       }
