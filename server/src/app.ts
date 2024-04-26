@@ -68,7 +68,7 @@ const createChatCompletion = async (
 
 const queueQuiz = () => {
   for (const difficulty in quizQueue) {
-    if (quizQueue[difficulty].length < 5) {
+    if (quizQueue[difficulty].length < 3) {
       createChatCompletion(difficulty).then(
         (res) => {
           if (checkQuiz(res)) {
@@ -78,8 +78,8 @@ const queueQuiz = () => {
                 quizQueue[difficulty].length - 1
               }`
             );
+            if (quizQueue[difficulty].length < 3) queueQuiz();
           }
-          queueQuiz();
         },
         (err) => {
           console.error(`Failed to generate quiz content for queing`);

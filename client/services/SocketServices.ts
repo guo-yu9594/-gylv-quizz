@@ -11,7 +11,7 @@ export default class SocketServices {
   public inRoom: boolean = false;
 
   constructor() {
-    this.socket = io("https://gylv-quiz-client.onrender.com", {
+    this.socket = io("https://gylv-quiz.onrender.com", {
       autoConnect: false,
     });
     this.socket.connect();
