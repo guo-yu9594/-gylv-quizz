@@ -82,8 +82,7 @@ const queueQuiz = () => {
           }
         },
         (err) => {
-          console.error(`Failed to generate quiz content for queing`);
-          console.error(err);
+          console.log(`Failed to generate quiz content for queing`);
         }
       );
     }
