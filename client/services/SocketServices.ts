@@ -1,4 +1,5 @@
 import { ResSelectType } from "@/app/components/Quiz";
+import { Difficulty, Settings } from "@/app/components/QuizSettings";
 import { NewPlayerData } from "@/types";
 import io, { Socket } from "socket.io-client";
 
@@ -20,11 +21,11 @@ export default class SocketServices {
     this.socket.on(eventName, callback);
   };
 
-  single = () => {
+  single = (settings: Settings) => {
     this.socket.emit("create", { username: this.username }, (res: any) => {
       this.roomId = res;
       this.inRoom = true;
-      this.start();
+      this.start(settings);
     });
   };
 
@@ -54,10 +55,10 @@ export default class SocketServices {
     );
   };
 
-  start = () => {
+  start = (settings: Settings) => {
     this.socket.emit(
       "start",
-      { subject: "technologie", roomId: this.roomId },
+      { settings, roomId: this.roomId },
       (res: any) => {
         console.log(res);
       }

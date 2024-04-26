@@ -27,3 +27,9 @@ export type QuizData = {
   }[],
   answers: number[]
 }
+
+export type Difficulty = "easy" | "normal" | "hard";
+
+export type Settings = {
+  difficulty: Difficulty;
+};

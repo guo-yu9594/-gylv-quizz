@@ -30,7 +30,9 @@ export type NewPlayerData = {
 };
 
 export type CTSStartData = {
-  subject: string;
+  settings: {
+    difficulty: "easy" | "normal" | "hard";
+  };
   roomId: string;
 };
 

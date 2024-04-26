@@ -1,4 +1,4 @@
-import { Result } from "./session";
+import { Result, Settings } from "./session";
 
 export type JoinData = {
   username: string;
@@ -15,7 +15,7 @@ export type NewPlayerData = {
 };
 
 export type CTSStartData = {
-  subject: string;
+  settings: Settings;
   roomId: string;
 };
 

@@ -34,7 +34,11 @@ const openai = new OpenAI({
 let users: Users = {};
 let rooms: Rooms = {};
 let answers: Answers = {};
-let quizQueue: QuizData[] = [];
+let quizQueue: { [difficulty: string]: QuizData[] } = {
+  easy: [],
+  normal: [],
+  hard: [],
+};
 
 const checkQuiz = (quiz: any) => {
   if (
@@ -50,46 +54,50 @@ const checkQuiz = (quiz: any) => {
   else return false;
 };
 
-const createChatCompletion = async (): Promise<any> => {
+const createChatCompletion = async (
+  difficulty: string = "normal"
+): Promise<any> => {
   const response = await openai.chat.completions.create({
     model: "gpt-3.5-turbo",
     // max_tokens: 350,
-    messages: aiConfigMessages(15, "general culture", "easy"),
+    messages: aiConfigMessages(15, "general culture", difficulty),
   });
   const formatResponseText = JSON.parse(response.choices[0].message.content);
   return formatResponseText;
 };
 
 const queueQuiz = () => {
-  if (quizQueue.length < 7) {
-    createChatCompletion().then(
-      (res) => {
-        if (checkQuiz(res)) {
-          quizQueue.push(res);
-          console.log(
-            `Quiz content successfully generated and queued, position in the queue: ${
-              quizQueue.length - 1
-            }`
-          );
+  for (const difficulty in quizQueue) {
+    if (quizQueue[difficulty].length < 5) {
+      createChatCompletion(difficulty).then(
+        (res) => {
+          if (checkQuiz(res)) {
+            quizQueue[difficulty].push(res);
+            console.log(
+              `Quiz content (${difficulty}) successfully generated and queued, position in the queue: ${
+                quizQueue[difficulty].length - 1
+              }`
+            );
+          }
+          queueQuiz();
+        },
+        (err) => {
+          console.error(`Failed to generate quiz content for queing`);
+          console.error(err);
         }
-        queueQuiz();
-      },
-      (err) => {
-        console.error(`Failed to generate quiz content for queing`);
-        console.error(err);
-      }
-    );
+      );
+    }
   }
 };
 
-const getQuiz = async (roomId: string): Promise<any> => {
-  if (quizQueue.length > 0) {
-    const quiz = quizQueue.shift();
+const getQuiz = async (roomId: string, difficulty: string): Promise<any> => {
+  if (quizQueue[difficulty].length > 0) {
+    const quiz = quizQueue[difficulty].shift();
     queueQuiz();
     return quiz;
   } else {
-    const quiz = await createChatCompletion();
-    if (checkQuiz(quiz)) return getQuiz(roomId);
+    const quiz = await createChatCompletion(difficulty);
+    if (checkQuiz(quiz)) return getQuiz(roomId, difficulty);
     return quiz;
   }
 };
@@ -130,11 +138,11 @@ const getUsersList = (roomId: string) => {
   for (const id in rooms[roomId]) {
     list.push({
       id: id,
-      username: rooms[roomId][id].username
+      username: rooms[roomId][id].username,
     });
   }
   return list;
-}
+};
 
 io.on("connection", (socket) => {
   console.log(`Player with ID ${socket.id} has been connected.`);
@@ -185,7 +193,10 @@ io.on("connection", (socket) => {
         rooms[clientRoomId][userId].inTest = true;
       });
       try {
-        const quiz = await getQuiz(dataClient.roomId);
+        const quiz = await getQuiz(
+          dataClient.roomId,
+          dataClient.settings.difficulty
+        );
         io.to(clientRoomId).emit("start", {
           questions: quiz.questions,
         });

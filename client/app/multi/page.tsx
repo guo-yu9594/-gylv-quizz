@@ -10,11 +10,13 @@ import { HiArrowSmRight } from "react-icons/hi";
 import Loading from "../components/Loading";
 import ResultModal from "../components/ResultModal";
 import Quiz from "../components/Quiz";
+import QuizSettings, { Settings } from "../components/QuizSettings";
 
 enum Step {
   NAME,
   INIT,
   ROOM,
+  SETTINGS,
   GAME,
 }
 
@@ -34,8 +36,8 @@ export default function Multi() {
     socket.end(answers);
     setIsLoading(true);
   };
-  const handleStart = () => {
-    socket.start();
+  const handleStart = (settings: Settings) => {
+    socket.start(settings);
     setIsLoading(true);
   };
   const handleJoin = () => {
@@ -96,7 +98,7 @@ export default function Multi() {
 
   return (
     <section className="flex flex-col items-center h-full w-full">
-      <Show active={!isLoading && step !== Step.GAME}>
+      <Show active={!isLoading && step !== Step.GAME && step != Step.SETTINGS}>
         <Card
           className={`w-full min-h-full p-8 space-y-12 justify-center items-center`}
           shadow="sm"
@@ -166,7 +168,7 @@ export default function Multi() {
                   className="mt-8"
                   size="lg"
                   color="primary"
-                  onClick={handleStart}
+                  onClick={() => setStep(Step.SETTINGS)}
                   disabled={!host}
                   isDisabled={!host}
                 >
@@ -177,7 +179,10 @@ export default function Multi() {
           </Show>
         </Card>
       </Show>
-      <Show active={step === Step.GAME}>
+      <Show active={!isLoading && step === Step.SETTINGS}>
+        <QuizSettings next={(settings) => handleStart(settings)} />
+      </Show>
+      <Show active={!isLoading && step === Step.GAME}>
         <Quiz content={questions as QuizContent} handleEnd={handleEnd} />
       </Show>
       <Show active={isLoading}>
