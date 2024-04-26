@@ -54,7 +54,7 @@ const createChatCompletion = async (): Promise<any> => {
   const response = await openai.chat.completions.create({
     model: "gpt-3.5-turbo",
     // max_tokens: 350,
-    messages: aiConfigMessages(10, "general culture", "easy"),
+    messages: aiConfigMessages(15, "general culture", "easy"),
   });
   const formatResponseText = JSON.parse(response.choices[0].message.content);
   return formatResponseText;
@@ -108,7 +108,7 @@ const getScores = (expectedAnswers: number[], roomUsers: Users): Result[] => {
       rank: 1,
     });
   }
-  return scores.sort((a, b) => a.score - b.score);
+  return scores.sort((a, b) => b.score - a.score);
 };
 
 const compileResults = (roomId: string): Result[] => {
@@ -118,11 +118,23 @@ const compileResults = (roomId: string): Result[] => {
   let rank = 1;
 
   for (let i = 1; i < scores.length; i++) {
-    if (scores[i].score > scores[i - 1].score) rank++;
+    if (scores[i].score < scores[i - 1].score) rank++;
     scores[i].rank = rank;
   }
   return scores;
 };
+
+const getUsersList = (roomId: string) => {
+  let list = [];
+
+  for (const id in rooms[roomId]) {
+    list.push({
+      id: id,
+      username: rooms[roomId][id].username
+    });
+  }
+  return list;
+}
 
 io.on("connection", (socket) => {
   console.log(`Player with ID ${socket.id} has been connected.`);
@@ -158,8 +170,7 @@ io.on("connection", (socket) => {
         username: data.username,
         id: socket.id,
       });
-
-      callback(rooms);
+      callback(getUsersList(data.roomId));
       console.log(
         `Room ${data.roomId} successfully joined by player "${data.username}" with ID ${socket.id}.`
       );

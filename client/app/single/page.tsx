@@ -19,7 +19,6 @@ export default function Single() {
 
   const handleEnd = (answers: number[]) => {
     socket.end(answers);
-    setIsLoading(true);
   };
 
   useEffect(() => {
@@ -37,7 +36,7 @@ export default function Single() {
   return (
     <section className="flex flex-col items-center h-full w-full">
       <Show active={isLoading}>
-        <Loading />
+        <Loading label="Generating the questions..." />
       </Show>
       <Show active={!isLoading}>
         <Quiz content={questions as QuizContent} handleEnd={handleEnd} />
