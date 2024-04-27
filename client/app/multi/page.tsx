@@ -188,7 +188,7 @@ export default function Multi() {
       <Show active={isLoading}>
         <Loading label="Loading..." />
       </Show>
-      <ResultModal open={showResult} data={results} />
+      <ResultModal open={showResult} data={results} mode="multi" />
     </section>
   );
 }

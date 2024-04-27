@@ -21,9 +21,10 @@ import {
 type ResultModalProps = {
   open: boolean;
   data: STCEndData | undefined;
+  mode: "single" | "multi";
 };
 
-const ResultModal: React.FC<ResultModalProps> = ({ open, data }) => {
+const ResultModal: React.FC<ResultModalProps> = ({ open, data, mode }) => {
   if (!data || !data.results) return null;
 
   const rows = data.results.map((user) => {
@@ -65,7 +66,7 @@ const ResultModal: React.FC<ResultModalProps> = ({ open, data }) => {
               </Table>
             </ModalBody>
             <ModalFooter className="flex flex-col items-center">
-              <Link href="/single">
+              <Link href={`/${mode}`}>
                 <Button color="primary">Replay</Button>
               </Link>
               <Link href="/">

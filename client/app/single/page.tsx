@@ -53,7 +53,7 @@ export default function Single() {
       <Show active={settings != undefined && isLoading == false}>
         <Quiz content={questions as QuizContent} handleEnd={handleEnd} />
       </Show>
-      <ResultModal open={showResult} data={results} />
+      <ResultModal open={showResult} data={results} mode="single" />
     </section>
   );
 }
