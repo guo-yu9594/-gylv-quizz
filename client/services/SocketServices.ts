@@ -11,7 +11,7 @@ export default class SocketServices {
   public inRoom: boolean = false;
 
   constructor() {
-    this.socket = io("http://localhost:3001/", {
+    this.socket = io("http://93.127.203.28:3001/", {
       autoConnect: false, 
     });
     this.socket.connect();
