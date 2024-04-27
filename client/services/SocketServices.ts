@@ -11,8 +11,8 @@ export default class SocketServices {
   public inRoom: boolean = false;
 
   constructor() {
-    this.socket = io("https://gylv-quiz.onrender.com", {
-      autoConnect: false,
+    this.socket = io("http://localhost:3001/", {
+      autoConnect: false, 
     });
     this.socket.connect();
   }
@@ -56,13 +56,9 @@ export default class SocketServices {
   };
 
   start = (settings: Settings) => {
-    this.socket.emit(
-      "start",
-      { settings, roomId: this.roomId },
-      (res: any) => {
-        console.log(res);
-      }
-    );
+    this.socket.emit("start", { settings, roomId: this.roomId }, (res: any) => {
+      console.log(res);
+    });
   };
 
   end = (answers: number[]) => {

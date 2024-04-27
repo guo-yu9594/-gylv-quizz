@@ -22,8 +22,7 @@ const io = new Server<
   SocketData
 >(httpServer, {
   cors: {
-    origin: "https://gylv-quiz-client.onrender.com",
-    methods: ["GET", "POST"],
+    origin: "*",
   },
 });
 
