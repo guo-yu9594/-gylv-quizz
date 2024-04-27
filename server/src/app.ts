@@ -245,6 +245,8 @@ io.on("connection", (socket) => {
   socket.on("disconnect", (reason) => {
     if (users[socket.id] && rooms[users[socket.id].roomId] !== undefined) {
       delete rooms[users[socket.id].roomId][socket.id];
+      if (Object.keys(rooms[users[socket.id].roomId]).length <= 0)
+        delete rooms[users[socket.id].roomId];
     }
     delete users[socket.id];
     console.log(`Player ${socket.id} disconnected. Reason: ${reason}.`);
