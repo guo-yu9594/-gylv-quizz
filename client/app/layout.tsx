@@ -55,7 +55,7 @@ export default function RootLayout({
 								title="nextui.org homepage"
 							>
 								<span className="text-default-600">Made by</span>
-								<p className="text-primary">Guo Yu & Valentin Li</p>
+								<p className="text-primary">Guo & Alex</p>
 							</Link>
 						</footer>
 					</div>
