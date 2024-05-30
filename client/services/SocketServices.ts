@@ -11,7 +11,7 @@ export default class SocketServices {
   public inRoom: boolean = false;
 
   constructor() {
-    this.socket = io("http://185.172.57.23:3001/", {
+    this.socket = io("https://api.gylvquiz.online/", {
       autoConnect: false, 
     });
     this.socket.connect();
