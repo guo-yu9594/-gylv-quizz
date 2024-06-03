@@ -66,40 +66,116 @@ const createChatCompletion = async (
   return formatResponseText;
 };
 
-const queueQuiz = () => {
-  for (const difficulty in quizQueue) {
-    if (quizQueue[difficulty].length < 3) {
-      createChatCompletion(difficulty).then(
-        (res) => {
-          if (checkQuiz(res)) {
-            quizQueue[difficulty].push(res);
-            console.log(
-              `Quiz content (${difficulty}) successfully generated and queued, position in the queue: ${
-                quizQueue[difficulty].length - 1
-              }`
-            );
-            if (quizQueue[difficulty].length < 3) queueQuiz();
-          }
-        },
-        (err) => {
-          console.log(`Failed to generate quiz content for queing`);
-        }
+// const queueQuiz = () => {
+//   for (const difficulty in quizQueue) {
+//     if (quizQueue[difficulty].length < 3) {
+//       console.time(
+//         `Request: ${difficulty} ${quizQueue[difficulty].length - 1}`
+//       );
+//       createChatCompletion(difficulty).then(
+//         (res) => {
+//           console.timeEnd(
+//             `Request: ${difficulty} ${quizQueue[difficulty].length - 1}`
+//           );
+//           if (checkQuiz(res)) {
+//             quizQueue[difficulty].push(res);
+//             console.log(
+//               `Quiz content (${difficulty}) successfully generated and queued, position in the queue: ${
+//                 quizQueue[difficulty].length - 1
+//               }`
+//             );
+//             if (quizQueue[difficulty].length < 3) queueQuiz();
+//           }
+//         },
+//         (err) => {
+//           console.timeEnd(
+//             `Request: ${difficulty} ${quizQueue[difficulty].length - 1}`
+//           );
+//           console.log(`Failed to generate quiz content for queing`);
+//         }
+//       );
+//     }
+//   }
+// };
+
+const responseTimes = [];
+let totalRequests = 0;
+let totalErrors = 0;
+
+const measureQuizGeneration = async (
+  totalRequests,
+  concurrentRequests,
+  difficulty
+) => {
+  const performRequest = async (index) => {
+    const requestId = `${difficulty} ${index}`;
+    console.time(`Request: ${requestId}`);
+
+    try {
+      const startTime = performance.now();
+      const res = await createChatCompletion(difficulty);
+      const endTime = performance.now();
+
+      console.timeEnd(`Request: ${requestId}`);
+      const responseTime = endTime - startTime;
+      responseTimes.push(responseTime);
+      console.log(
+        `Request: ${requestId} completed in ${responseTime.toFixed(2)}ms`
       );
+    } catch (err) {
+      console.timeEnd(`Request: ${requestId}`);
+      totalErrors++;
+      console.log(`Request: ${requestId} failed`);
     }
+    displayMetrics();
+  };
+
+  const requestQueue = [];
+  for (let i = 0; i < totalRequests; i++) {
+    requestQueue.push(performRequest(i));
+    if (requestQueue.length >= concurrentRequests) {
+      await Promise.all(requestQueue);
+      requestQueue.length = 0; // Reset the queue after processing
+    }
+  }
+
+  // Await remaining requests
+  await Promise.all(requestQueue);
+};
+
+const displayMetrics = () => {
+  const totalTime = responseTimes.reduce((a, b) => a + b, 0);
+  const avgTime = totalTime / responseTimes.length;
+  const maxTime = Math.max(...responseTimes);
+  totalRequests++;
+
+  if (totalRequests < totalRequestsToSend) {
+    console.log("--- Performance Metrics ---");
+    console.log(`Total Requests: ${totalRequests}`);
+    console.log(`Total Errors: ${totalErrors}`);
+    console.log(`Average Response Time: ${avgTime.toFixed(2)}ms`);
+    console.log(`Maximum Response Time: ${maxTime.toFixed(2)}ms`);
+    console.log("----------------------------");
   }
 };
 
-const getQuiz = async (roomId: string, difficulty: string): Promise<any> => {
-  if (quizQueue[difficulty].length > 0) {
-    const quiz = quizQueue[difficulty].shift();
-    queueQuiz();
-    return quiz;
-  } else {
-    const quiz = await createChatCompletion(difficulty);
-    if (checkQuiz(quiz)) return getQuiz(roomId, difficulty);
-    return quiz;
-  }
-};
+// Example usage
+const totalRequestsToSend = 35; // Total number of requests
+const concurrentRequests = 100; // Number of simultaneous requests
+const difficulty = "easy"; // Difficulty level for the test
+measureQuizGeneration(totalRequestsToSend, concurrentRequests, difficulty);
+
+// const getQuiz = async (roomId: string, difficulty: string): Promise<any> => {
+//   if (quizQueue[difficulty].length > 0) {
+//     const quiz = quizQueue[difficulty].shift();
+//     queueQuiz();
+//     return quiz;
+//   } else {
+//     const quiz = await createChatCompletion(difficulty);
+//     if (checkQuiz(quiz)) return getQuiz(roomId, difficulty);
+//     return quiz;
+//   }
+// };
 
 const getScores = (expectedAnswers: number[], roomUsers: Users): Result[] => {
   let scores: Result[] = [];
@@ -192,17 +268,17 @@ io.on("connection", (socket) => {
         rooms[clientRoomId][userId].inTest = true;
       });
       try {
-        const quiz = await getQuiz(
-          dataClient.roomId,
-          dataClient.settings.difficulty
-        );
-        io.to(clientRoomId).emit("start", {
-          questions: quiz.questions,
-        });
-        answers[clientRoomId] = quiz.answers;
-        console.log(
-          `Quiz content successfully gotted and sent for room ${dataClient.roomId}.`
-        );
+        // const quiz = await getQuiz(
+        //   dataClient.roomId,
+        //   dataClient.settings.difficulty
+        // );
+        // io.to(clientRoomId).emit("start", {
+        //   questions: quiz.questions,
+        // });
+        // answers[clientRoomId] = quiz.answers;
+        // console.log(
+        //   `Quiz content successfully gotted and sent for room ${dataClient.roomId}.`
+        // );
       } catch (err) {
         console.error(
           `Failed to get quiz content for room ${dataClient.roomId}.`
@@ -256,4 +332,4 @@ httpServer.listen(port, () => {
   console.log(`Server Socket.io is running at http://localhost:${port}`);
 });
 
-queueQuiz();
+// queueQuiz();

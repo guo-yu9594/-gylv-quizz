@@ -1,0 +1,245 @@
+Request: easy 0: 9.906s
+Request: easy 0 completed in 9906.11ms
+--- Performance Metrics ---
+Total Errors: 0
+Average Response Time: 9906.11ms
+Maximum Response Time: 9906.11ms
+----------------------------
+Request: easy 1: 12.133s
+Request: easy 1 completed in 12133.16ms
+--- Performance Metrics ---
+Total Errors: 0
+Average Response Time: 11019.63ms
+Maximum Response Time: 12133.16ms
+----------------------------
+Request: easy 2: 11.280s
+Request: easy 2 completed in 11280.44ms
+--- Performance Metrics ---
+Total Errors: 0
+Average Response Time: 11106.57ms
+Maximum Response Time: 12133.16ms
+----------------------------
+Request: easy 3: 12.607s
+Request: easy 3 completed in 12606.78ms
+--- Performance Metrics ---
+Total Errors: 0
+Average Response Time: 11481.62ms
+Maximum Response Time: 12606.78ms
+----------------------------
+Request: easy 4: 16.812s
+Request: easy 4 completed in 16811.65ms
+--- Performance Metrics ---
+Total Errors: 0
+Average Response Time: 12547.63ms
+Maximum Response Time: 16811.65ms
+----------------------------
+Request: easy 5: 13.061s
+Request: easy 5 completed in 13061.26ms
+--- Performance Metrics ---
+Total Errors: 0
+Average Response Time: 12633.23ms
+Maximum Response Time: 16811.65ms
+----------------------------
+Request: easy 6: 13.054s
+Request: easy 6 completed in 13053.96ms
+--- Performance Metrics ---
+Total Errors: 0
+Average Response Time: 12693.34ms
+Maximum Response Time: 16811.65ms
+----------------------------
+Request: easy 7: 13.054s
+Request: easy 7 completed in 13054.28ms
+--- Performance Metrics ---
+Total Errors: 0
+Average Response Time: 12738.45ms
+Maximum Response Time: 16811.65ms
+----------------------------
+Request: easy 8: 16.610s
+Request: easy 8 completed in 16610.13ms
+--- Performance Metrics ---
+Total Errors: 0
+Average Response Time: 13168.64ms
+Maximum Response Time: 16811.65ms
+----------------------------
+Request: easy 9: 11.802s
+Request: easy 9 completed in 11801.60ms
+--- Performance Metrics ---
+Total Errors: 0
+Average Response Time: 13031.94ms
+Maximum Response Time: 16811.65ms
+----------------------------
+Request: easy 10: 13.161s
+Request: easy 10 completed in 13160.50ms
+--- Performance Metrics ---
+Total Errors: 0
+Average Response Time: 13043.62ms
+Maximum Response Time: 16811.65ms
+----------------------------
+Request: easy 11: 15.248s
+Request: easy 11 completed in 15248.35ms
+--- Performance Metrics ---
+Total Errors: 0
+Average Response Time: 13227.35ms
+Maximum Response Time: 16811.65ms
+----------------------------
+Request: easy 12: 12.362s
+Request: easy 12 completed in 12362.29ms
+--- Performance Metrics ---
+Total Errors: 0
+Average Response Time: 13160.81ms
+Maximum Response Time: 16811.65ms
+----------------------------
+Request: easy 13: 11.138s
+Request: easy 13 completed in 11138.00ms
+--- Performance Metrics ---
+Total Errors: 0
+Average Response Time: 13016.32ms
+Maximum Response Time: 16811.65ms
+----------------------------
+Request: easy 14: 11.175s
+Request: easy 14 completed in 11175.17ms
+--- Performance Metrics ---
+Total Errors: 0
+Average Response Time: 12893.58ms
+Maximum Response Time: 16811.65ms
+----------------------------
+Request: easy 15: 11.073s
+Request: easy 15 completed in 11072.60ms
+--- Performance Metrics ---
+Total Errors: 0
+Average Response Time: 12779.77ms
+Maximum Response Time: 16811.65ms
+----------------------------
+Request: easy 16: 14.831s
+Request: easy 16 completed in 14830.57ms
+--- Performance Metrics ---
+Total Errors: 0
+Average Response Time: 12900.40ms
+Maximum Response Time: 16811.65ms
+----------------------------
+Request: easy 17: 14.938s
+Request: easy 17 completed in 14937.56ms
+--- Performance Metrics ---
+Total Errors: 0
+Average Response Time: 13013.58ms
+Maximum Response Time: 16811.65ms
+----------------------------
+Request: easy 18: 11.069s
+Request: easy 18 completed in 11069.40ms
+--- Performance Metrics ---
+Total Errors: 0
+Average Response Time: 12911.25ms
+Maximum Response Time: 16811.65ms
+----------------------------
+Request: easy 19: 15.145s
+Request: easy 19 completed in 15145.03ms
+--- Performance Metrics ---
+Total Errors: 0
+Average Response Time: 13022.94ms
+Maximum Response Time: 16811.65ms
+----------------------------
+Request: easy 20: 10.427s
+Request: easy 20 completed in 10426.72ms
+--- Performance Metrics ---
+Total Errors: 0
+Average Response Time: 12899.31ms
+Maximum Response Time: 16811.65ms
+----------------------------
+Request: easy 21: 14.640s
+Request: easy 21 completed in 14639.84ms
+--- Performance Metrics ---
+Total Errors: 0
+Average Response Time: 12978.43ms
+Maximum Response Time: 16811.65ms
+----------------------------
+Request: easy 22: 14.205s
+Request: easy 22 completed in 14205.41ms
+--- Performance Metrics ---
+Total Errors: 0
+Average Response Time: 13031.77ms
+Maximum Response Time: 16811.65ms
+----------------------------
+Request: easy 23: 11.802s
+Request: easy 23 completed in 11802.45ms
+--- Performance Metrics ---
+Total Errors: 0
+Average Response Time: 12980.55ms
+Maximum Response Time: 16811.65ms
+----------------------------
+Request: easy 24: 13.160s
+Request: easy 24 completed in 13160.30ms
+--- Performance Metrics ---
+Total Errors: 0
+Average Response Time: 12987.74ms
+Maximum Response Time: 16811.65ms
+----------------------------
+Request: easy 25: 12.283s
+Request: easy 25 completed in 12282.71ms
+--- Performance Metrics ---
+Total Errors: 0
+Average Response Time: 12960.63ms
+Maximum Response Time: 16811.65ms
+----------------------------
+Request: easy 26: 14.426s
+Request: easy 26 failed
+--- Performance Metrics ---
+Total Errors: 1
+Average Response Time: 12960.63ms
+Maximum Response Time: 16811.65ms
+----------------------------
+Request: easy 27: 12.130s
+Request: easy 27 completed in 12130.40ms
+--- Performance Metrics ---
+Total Errors: 1
+Average Response Time: 12929.88ms
+Maximum Response Time: 16811.65ms
+----------------------------
+Request: easy 28: 11.609s
+Request: easy 28 completed in 11608.66ms
+--- Performance Metrics ---
+Total Errors: 1
+Average Response Time: 12882.69ms
+Maximum Response Time: 16811.65ms
+----------------------------
+Request: easy 29: 11.207s
+Request: easy 29 completed in 11206.70ms
+--- Performance Metrics ---
+Total Errors: 1
+Average Response Time: 12824.90ms
+Maximum Response Time: 16811.65ms
+----------------------------
+Request: easy 30: 10.519s
+Request: easy 30 completed in 10518.81ms
+--- Performance Metrics ---
+Total Errors: 1
+Average Response Time: 12748.03ms
+Maximum Response Time: 16811.65ms
+----------------------------
+Request: easy 31: 14.728s
+Request: easy 31 completed in 14727.69ms
+--- Performance Metrics ---
+Total Errors: 1
+Average Response Time: 12811.89ms
+Maximum Response Time: 16811.65ms
+----------------------------
+Request: easy 32: 10.630s
+Request: easy 32 completed in 10630.44ms
+--- Performance Metrics ---
+Total Errors: 1
+Average Response Time: 12743.72ms
+Maximum Response Time: 16811.65ms
+----------------------------
+Request: easy 33: 14.539s
+Request: easy 33 completed in 14539.05ms
+--- Performance Metrics ---
+Total Errors: 1
+Average Response Time: 12798.12ms
+Maximum Response Time: 16811.65ms
+----------------------------
+Request: easy 34: 11.258s
+Request: easy 34 completed in 11257.72ms
+--- Performance Metrics ---
+Total Errors: 1
+Average Response Time: 12752.81ms
+Maximum Response Time: 16811.65ms
+----------------------------
